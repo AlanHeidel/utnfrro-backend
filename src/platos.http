@@ -1,0 +1,26 @@
+### Obtener listado
+GET http://localhost:3000/api/platos
+
+### Obtener plato por ID
+GET http://localhost:3000/api/platos/1
+
+
+### Crear nuevo plato
+POST http://localhost:3000/api/platos
+Content-Type: application/json
+
+{
+    "id": "3",
+    "nombre": "Tira de Asado",
+    "precio": 12.50,
+    "ingredientes": [
+        "Carne de res",
+        "Sal",
+        "Pimienta"
+    ],
+    "tipoPlato": {
+        "idTipoPlato": "2",
+        "nombre": "Plato Principal"
+    },
+    "imagen": "https://example.com/ensalada-cesar.jpg"
+}
