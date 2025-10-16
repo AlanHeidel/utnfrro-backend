@@ -1,0 +1,40 @@
+### Obtener todos los mozos
+GET http://localhost:3000/api/mozos
+
+### Obtener mozo por ID
+GET http://localhost:3000/api/mozos/1
+
+### Crear nuevo mozo
+POST http://localhost:3000/api/mozos
+Content-Type: application/json
+
+{
+    "nombre": "Martín",
+    "apellido": "Gómez",
+    "telefono": "3515551234",
+    "email": "martin.gomez@restaurante.com",
+    "dni": "66778899"
+}
+
+### Modificar mozo (PUT)
+PUT http://localhost:3000/api/mozos/1
+Content-Type: application/json
+
+{
+    "nombre": "Roberto Carlos",
+    "apellido": "Fernández",
+    "telefono": "3517777777",
+    "email": "roberto.fernandez@restaurante.com",
+    "dni": "33445566"
+}
+
+### Modificar mozo (PATCH)
+PATCH http://localhost:3000/api/mozos/1
+Content-Type: application/json
+
+{
+    "telefono": "3511111111"
+}
+
+### Eliminar mozo
+DELETE http://localhost:3000/api/mozos/1

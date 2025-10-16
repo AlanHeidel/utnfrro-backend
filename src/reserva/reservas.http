@@ -1,0 +1,66 @@
+### Obtener todas las reservas
+GET http://localhost:3000/api/reservas
+
+### Obtener reserva por ID
+GET http://localhost:3000/api/reservas/1
+
+### Crear nueva reserva
+POST http://localhost:3000/api/reservas
+Content-Type: application/json
+
+{
+    "cliente": {
+        "id": "1",
+        "nombre": "Juan",
+        "apellido": "Pérez",
+        "telefono": "3512345678",
+        "email": "juan.perez@email.com",
+        "dni": "12345678"
+    },
+    "mesa": {
+        "id": "1",
+        "numero": 1,
+        "capacidad": 4,
+        "estado": "reservada"
+    },
+    "fecha": "2024-12-31",
+    "hora": "21:00",
+    "cantidadPersonas": 4,
+    "estado": "confirmada"
+}
+
+### Modificar reserva (PUT)
+PUT http://localhost:3000/api/reservas/1
+Content-Type: application/json
+
+{
+    "cliente": {
+        "id": "1",
+        "nombre": "Juan",
+        "apellido": "Pérez",
+        "telefono": "3512345678",
+        "email": "juan.perez@email.com",
+        "dni": "12345678"
+    },
+    "mesa": {
+        "id": "2",
+        "numero": 2,
+        "capacidad": 2,
+        "estado": "reservada"
+    },
+    "fecha": "2024-12-31",
+    "hora": "22:00",
+    "cantidadPersonas": 2,
+    "estado": "confirmada"
+}
+
+### Modificar reserva (PATCH) - Cambiar estado
+PATCH http://localhost:3000/api/reservas/1
+Content-Type: application/json
+
+{
+    "estado": "cancelada"
+}
+
+### Eliminar reserva
+DELETE http://localhost:3000/api/reservas/1

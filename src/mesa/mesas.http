@@ -1,0 +1,36 @@
+### Obtener todas las mesas
+GET http://localhost:3000/api/mesas
+
+### Obtener mesa por ID
+GET http://localhost:3000/api/mesas/1
+
+### Crear nueva mesa
+POST http://localhost:3000/api/mesas
+Content-Type: application/json
+
+{
+    "numero": 10,
+    "capacidad": 4,
+    "estado": "disponible"
+}
+
+### Modificar mesa (PUT)
+PUT http://localhost:3000/api/mesas/1
+Content-Type: application/json
+
+{
+    "numero": 1,
+    "capacidad": 6,
+    "estado": "ocupada"
+}
+
+### Modificar mesa (PATCH)
+PATCH http://localhost:3000/api/mesas/1
+Content-Type: application/json
+
+{
+    "estado": "disponible"
+}
+
+### Eliminar mesa
+DELETE http://localhost:3000/api/mesas/1

@@ -27,3 +27,8 @@ dist/**/*
 
 ## built vscode extensions
 *.vsix
+
+# SQLite database
+*.sqlite
+*.sqlite3
+*.db

@@ -1,0 +1,125 @@
+### Obtener todos los pedidos
+GET http://localhost:3000/api/pedidos
+
+### Obtener pedido por ID
+GET http://localhost:3000/api/pedidos/1
+
+### Crear nuevo pedido
+POST http://localhost:3000/api/pedidos
+Content-Type: application/json
+
+{
+    "mesa": {
+        "id": "1",
+        "numero": 1,
+        "capacidad": 4,
+        "estado": "ocupada"
+    },
+    "cliente": {
+        "id": "1",
+        "nombre": "Juan",
+        "apellido": "Pérez",
+        "telefono": "3512345678",
+        "email": "juan.perez@email.com",
+        "dni": "12345678"
+    },
+    "mozo": {
+        "id": "1",
+        "nombre": "Roberto",
+        "apellido": "Fernández",
+        "telefono": "3517777777",
+        "email": "roberto.fernandez@restaurante.com",
+        "dni": "33445566"
+    },
+    "items": [
+        {
+            "plato": {
+                "id": "1",
+                "nombre": "Milanesa a la napolitana",
+                "precio": 1500,
+                "ingredientes": ["milanesa", "queso"],
+                "tipoPlato": {
+                    "idTipoPlato": "2",
+                    "nombre": "Plato Principal"
+                },
+                "imagen": "https://example.com/milanesa.jpg"
+            },
+            "cantidad": 2,
+            "subtotal": 3000
+        },
+        {
+            "plato": {
+                "id": "2",
+                "nombre": "Ensalada Caesar",
+                "precio": 1200,
+                "ingredientes": ["lechuga", "pollo"],
+                "tipoPlato": {
+                    "idTipoPlato": "1",
+                    "nombre": "Entrada"
+                },
+                "imagen": "https://example.com/ensalada.jpg"
+            },
+            "cantidad": 1,
+            "subtotal": 1200
+        }
+    ],
+    "estado": "pendiente"
+}
+
+### Modificar pedido (PUT) - Cambiar estado
+PUT http://localhost:3000/api/pedidos/1
+Content-Type: application/json
+
+{
+    "mesa": {
+        "id": "1",
+        "numero": 1,
+        "capacidad": 4,
+        "estado": "ocupada"
+    },
+    "cliente": {
+        "id": "1",
+        "nombre": "Juan",
+        "apellido": "Pérez",
+        "telefono": "3512345678",
+        "email": "juan.perez@email.com",
+        "dni": "12345678"
+    },
+    "mozo": {
+        "id": "1",
+        "nombre": "Roberto",
+        "apellido": "Fernández",
+        "telefono": "3517777777",
+        "email": "roberto.fernandez@restaurante.com",
+        "dni": "33445566"
+    },
+    "items": [
+        {
+            "plato": {
+                "id": "1",
+                "nombre": "Milanesa a la napolitana",
+                "precio": 1500,
+                "ingredientes": ["milanesa", "queso"],
+                "tipoPlato": {
+                    "idTipoPlato": "2",
+                    "nombre": "Plato Principal"
+                },
+                "imagen": "https://example.com/milanesa.jpg"
+            },
+            "cantidad": 2,
+            "subtotal": 3000
+        }
+    ],
+    "estado": "en_preparacion"
+}
+
+### Modificar pedido (PATCH) - Solo cambiar estado
+PATCH http://localhost:3000/api/pedidos/1
+Content-Type: application/json
+
+{
+    "estado": "listo"
+}
+
+### Eliminar pedido
+DELETE http://localhost:3000/api/pedidos/1
