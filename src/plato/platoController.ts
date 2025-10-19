@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { PlatoRepository } from "./platoRepository.sqlite.js";
+import { PlatoRepository } from "./platoRepository.js";
 import { Plato } from "./platoEntity.js";
 
 const repository = new PlatoRepository();
