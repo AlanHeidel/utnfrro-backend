@@ -26,4 +26,6 @@ dist/**/*
 .history/
 
 ## built vscode extensions
-*.vsix
+*.vsixdocker-volumes/
+
+docker-volumes/
