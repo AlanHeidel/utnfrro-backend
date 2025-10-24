@@ -30,4 +30,16 @@
                 }
 4)  Crear directorios src y dist         
 
-5)   
+5)   faltan pasos...
+
+
+Contenedor en docker con percona:
+docker run --name percona-dsw \
+  -v "/Users/alanheidel/DSW/TP DSW/BackEnd/docker-volumes/percona:/var/lib/mysql" \
+  -e MYSQL_ROOT_HOST='%' \
+  -e MYSQL_ALLOW_EMPTY_PASSWORD="yes" \
+  -e MYSQL_PASSWORD="restaurantppa" \
+  -e MYSQL_USER="user" \
+  -e MYSQL_DATABASE='restaurant_PPA' \
+  -p 3307:3306 \
+  -d percona/percona-server:8.0

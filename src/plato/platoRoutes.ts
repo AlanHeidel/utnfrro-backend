@@ -1,18 +1,11 @@
 import { Router } from "express";
-import {
-  sanitizePlatoInput,
-  findAll,
-  findOne,
-  add,
-  update,
-  remove,
-} from "./platoController.js";
+import { findAll, findOne, add, update, remove } from "./platoController.js";
 
 export const platoRouter = Router();
 
 platoRouter.get("/", findAll);
 platoRouter.get("/:id", findOne);
-platoRouter.post("/", sanitizePlatoInput, add);
-platoRouter.put("/:id", sanitizePlatoInput, update);
-platoRouter.patch("/:id", sanitizePlatoInput, update);
+platoRouter.post("/", add);
+platoRouter.put("/:id", update);
+platoRouter.patch("/:id", update);
 platoRouter.delete("/:id", remove);
