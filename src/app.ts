@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import express from "express";
-import { platoRouter } from "./plato/platoRoutes.js";
+import { platoRouter } from "./plato/plato.routes.js";
 import { pedidoRouter } from "./pedido/pedido.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
