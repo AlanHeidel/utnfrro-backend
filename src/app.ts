@@ -1,11 +1,22 @@
 import "reflect-metadata";
 import express from "express";
+import cors from "cors";
 import { platoRouter } from "./plato/plato.routes.js";
 import { pedidoRouter } from "./pedido/pedido.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use((req, res, next) => {
