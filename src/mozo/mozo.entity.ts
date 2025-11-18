@@ -5,6 +5,10 @@ import { BaseEntity } from "../shared/db/baseEntity.entity.js";
 export class Mozo extends BaseEntity {
   @Property()
   nombre!: string;
+
   @Property()
   apellido!: string;
+
+  @Property()
+  dni!: string;
 }

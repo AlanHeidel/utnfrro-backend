@@ -23,8 +23,8 @@ const em = orm.em;
 
 async function findAll(req: Request, res: Response) {
   try {
-    const pedidos = await em.find(Plato, {});
-    res.status(200).json({ message: "finded all platos", data: pedidos });
+    const platos = await em.find(Plato, {}, { populate: ["tipoPlato"] });
+    res.status(200).json({ message: "finded all platos", data: platos });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -32,9 +32,9 @@ async function findAll(req: Request, res: Response) {
 
 async function add(req: Request, res: Response) {
   try {
-    const pedido = em.create(Plato, req.body);
+    const plato = em.create(Plato, req.body);
     await em.flush();
-    res.status(201).json({ message: "Plato was created", data: pedido });
+    res.status(201).json({ message: "Plato was created", data: plato });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -43,8 +43,8 @@ async function add(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const pedido = await em.findOneOrFail(Plato, { id });
-    res.status(200).json({ message: "found plato", data: pedido });
+    const plato = await em.findOneOrFail(Plato, { id }, { populate: ["tipoPlato"] });
+    res.status(200).json({ message: "found plato", data: plato });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -53,8 +53,8 @@ async function findOne(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const pedido = em.getReference(Plato, id);
-    em.assign(pedido, req.body);
+    const plato = em.getReference(Plato, id);
+    em.assign(plato, req.body);
     await em.flush();
     res.status(200).json({ message: "plato updated" });
   } catch (error: any) {
@@ -65,8 +65,8 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const pedido = em.getReference(Plato, id);
-    await em.removeAndFlush(pedido);
+    const plato = em.getReference(Plato, id);
+    await em.removeAndFlush(plato);
     res.status(200).send({ message: "plato deleted" });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

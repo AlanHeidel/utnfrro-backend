@@ -3,6 +3,9 @@ import express from "express";
 import cors from "cors";
 import { platoRouter } from "./plato/plato.routes.js";
 import { pedidoRouter } from "./pedido/pedido.routes.js";
+import { tipoPlatoRouter } from "./tipoPlato/tipoPlato.routes.js";
+import { mesaRouter } from "./mesa/mesa.routes.js";
+import { mozoRouter } from "./mozo/mozo.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 
@@ -25,6 +28,9 @@ app.use((req, res, next) => {
 
 app.use("/api/platos", platoRouter);
 app.use("/api/pedidos", pedidoRouter);
+app.use("/api/tipoPlatos", tipoPlatoRouter);
+app.use("/api/mesas", mesaRouter);
+app.use("/api/mozos", mozoRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
