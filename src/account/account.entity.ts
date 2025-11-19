@@ -14,8 +14,8 @@ export class Account extends BaseEntity {
   @Property({ unique: true })
   identifier!: string;
 
-  @Property({ hidden: true, nullable: true })
-  passwordHash?: string;
+  @Property({ hidden: true })
+  passwordHash!: string;
 
   @Enum(() => AccountRole)
   role: AccountRole = AccountRole.CLIENTE;

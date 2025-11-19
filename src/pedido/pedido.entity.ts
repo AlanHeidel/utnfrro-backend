@@ -1,27 +1,46 @@
 import {
+  Cascade,
   Collection,
   Entity,
-  ManyToMany,
+  Enum,
+  OneToMany,
   ManyToOne,
   Property,
   Rel,
 } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js";
-import { Mesa } from "../mesa/mesa.entity.js";
-import { Plato } from "../plato/plato.entity.js";
-import { Cliente } from "../cliente/cliente.entity.js";
+import { Mesa, MesaEstado } from "../mesa/mesa.entity.js";
+import { PedidoItem } from "./pedidoItem.entity.js";
+
+export enum PedidoEstado {
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  DELIVERED = "delivered",
+  CANCELED = "canceled",
+}
 
 @Entity()
 export class Pedido extends BaseEntity {
   @Property()
-  fechaHora!: Date;
+  fechaHora: Date = new Date();
 
   @ManyToOne(() => Mesa, { nullable: false })
   mesa!: Rel<Mesa>;
 
-  @ManyToOne(() => Cliente, { nullable: true })
-  cliente?: Cliente;
+  @Enum(() => PedidoEstado)
+  estado: PedidoEstado = PedidoEstado.PENDING;
 
-  @ManyToMany(() => Plato)
-  platos = new Collection<Plato>(this);
+  @Property()
+  total!: number;
+
+  @OneToMany(() => PedidoItem, (item: PedidoItem) => item.pedido, {
+    cascade: [Cascade.ALL],
+  })
+  items = new Collection<PedidoItem>(this);
+
+  setMesaOcupada() {
+    if (this.mesa && "estado" in this.mesa) {
+      this.mesa.estado = MesaEstado.OCUPADA;
+    }
+  }
 }

@@ -9,6 +9,7 @@ import { mozoRouter } from "./mozo/mozo.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 import { accountRouter } from "./account/account.routes.js";
+
 import "dotenv/config";
 
 const app = express();
@@ -16,7 +17,7 @@ const app = express();
 app.use(
   cors({
     origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
@@ -34,6 +35,7 @@ app.use("/api/tipoPlatos", tipoPlatoRouter);
 app.use("/api/mesas", mesaRouter);
 app.use("/api/mozos", mozoRouter);
 app.use("/api/accounts", accountRouter);
+app.use("/api/pedidos", pedidoRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
