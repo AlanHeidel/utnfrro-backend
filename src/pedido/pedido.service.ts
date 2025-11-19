@@ -83,7 +83,7 @@ export class PedidoService {
     const pedidos = await em.find(
       Pedido,
       {},
-      { populate: ["mesa", "items.plato"] }
+      { populate: ["mesa", "mesa.mozo", "items.plato"] }
     );
     return pedidos;
   }
