@@ -38,7 +38,7 @@ export async function login(req: Request, res: Response) {
       return res.status(400).json({ message: "identifier and password are required" });
     }
 
-    // 1) Se intenta logear en Account (CLIENTE/ADMIN)
+    // login en Account (CLIENTE/ADMIN)
     const account = await accountService.validateCredentials(identifier, password);
     if (account) {
       const token = signAccountToken({ sub: account.id, role: account.role, clienteId: account.cliente?.id ?? null });
@@ -46,12 +46,11 @@ export async function login(req: Request, res: Response) {
 
     }
 
-    // 2) Se intenta en TableAccount (table device)
+    //login en TableAccount (table-device)
     const tableAccount = await tableAccountService.validateCredentials(identifier, password);
     if (tableAccount) {
       const token = signTableToken({ sub: tableAccount.id, mesaId: tableAccount.mesa.id });
       return res.status(200).json({ message: "login successful", data: tableAccount, type: "table-device", token });
-
     }
 
     return res.status(401).json({ message: "invalid credentials" });
