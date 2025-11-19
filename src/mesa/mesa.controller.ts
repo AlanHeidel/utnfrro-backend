@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { orm } from "../shared/db/orm.js";
 import { Mesa } from "./mesa.entity.js";
+import { tableAccountService } from "../tableAccount/tableAccount.service.js";
 
 const em = orm.em;
+const DEFAULT_TABLE_PASS = process.env.TABLE_DEFAULT_PASS || "mesa-pass";
 
 async function findAll(req: Request, res: Response) {
     try {
@@ -17,7 +19,25 @@ async function add(req: Request, res: Response) {
     try {
         const mesa = em.create(Mesa, req.body);
         await em.flush();
-        res.status(201).json({ message: "Mesa was created", data: mesa });
+
+        const plainPassword = DEFAULT_TABLE_PASS;
+        const identifier = `mesa-${mesa.numeroMesa ?? mesa.id}`;
+        const tableAccount = await tableAccountService.create({
+            mesaId: mesa.id,
+            password: plainPassword,
+            identifier,
+        });
+
+        res.status(201).json({
+            message: "Mesa creada y cuenta de mesa lista",
+            data: {
+                mesa,
+                tableAccount: {
+                    identifier: tableAccount.identifier,
+                    password: plainPassword,
+                },
+            },
+        });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

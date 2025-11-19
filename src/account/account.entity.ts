@@ -1,4 +1,4 @@
-import { Entity, Enum, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, Enum, OneToOne, Property } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js";
 import { Cliente } from "../cliente/cliente.entity.js";
 export enum AccountRole {
@@ -20,7 +20,7 @@ export class Account extends BaseEntity {
   @Enum(() => AccountRole)
   role: AccountRole = AccountRole.CLIENTE;
 
-  @ManyToOne(() => Cliente, { nullable: true })
+  @OneToOne(() => Cliente, { nullable: true, unique: true })
   cliente?: Cliente;
 
   @Property({ nullable: true })

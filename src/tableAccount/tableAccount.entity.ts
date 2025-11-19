@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Property } from "@mikro-orm/core";
+import { Entity, OneToOne, Property, Cascade } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js";
 import { Mesa } from "../mesa/mesa.entity.js";
 
@@ -10,7 +10,7 @@ export class TableAccount extends BaseEntity {
   @Property({ hidden: true })
   passwordHash!: string;
 
-  @ManyToOne(() => Mesa)
+  @OneToOne(() => Mesa, { unique: true, cascade: [Cascade.REMOVE] })
   mesa!: Mesa;
 
   @Property({ nullable: true })
