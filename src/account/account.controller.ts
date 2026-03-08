@@ -27,7 +27,9 @@ export async function registerCliente(req: Request, res: Response) {
 
     res.status(201).json({ message: "account created", data: account });
   } catch (error: any) {
-    res.status(400).json({ message: error.message ?? "unable to create account" });
+    res
+      .status(400)
+      .json({ message: error.message ?? "unable to create account" });
   }
 }
 
@@ -35,22 +37,50 @@ export async function login(req: Request, res: Response) {
   try {
     const { identifier, password } = req.body ?? {};
     if (!identifier || !password) {
-      return res.status(400).json({ message: "identifier and password are required" });
+      return res
+        .status(400)
+        .json({ message: "identifier and password are required" });
     }
 
     // login en Account (CLIENTE/ADMIN)
-    const account = await accountService.validateCredentials(identifier, password);
+    const account = await accountService.validateCredentials(
+      identifier,
+      password,
+    );
     if (account) {
-      const token = signAccountToken({ sub: account.id, role: account.role, clienteId: account.cliente?.id ?? null });
-      return res.status(200).json({ message: "login successful", data: account, type: account.role === AccountRole.ADMIN ? "admin" : "client", token });
-
+      const token = signAccountToken({
+        sub: account.id,
+        role: account.role,
+        clienteId: account.cliente?.id ?? null,
+      });
+      return res
+        .status(200)
+        .json({
+          message: "login successful",
+          data: account,
+          type: account.role === AccountRole.ADMIN,
+          token,
+        });
     }
 
     //login en TableAccount (table-device)
-    const tableAccount = await tableAccountService.validateCredentials(identifier, password);
+    const tableAccount = await tableAccountService.validateCredentials(
+      identifier,
+      password,
+    );
     if (tableAccount) {
-      const token = signTableToken({ sub: tableAccount.id, mesaId: tableAccount.mesa.id });
-      return res.status(200).json({ message: "login successful", data: tableAccount, type: "table-device", token });
+      const token = signTableToken({
+        sub: tableAccount.id,
+        mesaId: tableAccount.mesa.id,
+      });
+      return res
+        .status(200)
+        .json({
+          message: "login successful",
+          data: tableAccount,
+          type: "table-device",
+          token,
+        });
     }
 
     return res.status(401).json({ message: "invalid credentials" });
@@ -78,9 +108,15 @@ export async function createTableDeviceAccount(req: Request, res: Response) {
       nombre: payload.nombre,
     });
 
-    res.status(201).json({ message: "table device account ready", data: account });
+    res
+      .status(201)
+      .json({ message: "table device account ready", data: account });
   } catch (error: any) {
-    res.status(400).json({ message: error.message ?? "unable to create table device account" });
+    res
+      .status(400)
+      .json({
+        message: error.message ?? "unable to create table device account",
+      });
   }
 }
 
@@ -89,7 +125,9 @@ export async function listAccounts(_req: Request, res: Response) {
     const accounts = await accountService.list();
     res.status(200).json({ data: accounts });
   } catch (error: any) {
-    res.status(500).json({ message: error.message ?? "unable to list accounts" });
+    res
+      .status(500)
+      .json({ message: error.message ?? "unable to list accounts" });
   }
 }
 
@@ -112,6 +150,8 @@ export async function listTableAccounts(_req: Request, res: Response) {
     const accounts = await tableAccountService.list();
     res.status(200).json({ data: accounts });
   } catch (error: any) {
-    res.status(500).json({ message: error.message ?? "unable to list table accounts" });
+    res
+      .status(500)
+      .json({ message: error.message ?? "unable to list table accounts" });
   }
 }

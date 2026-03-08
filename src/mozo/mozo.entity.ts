@@ -11,4 +11,7 @@ export class Mozo extends BaseEntity {
 
   @Property()
   dni!: string;
+
+  @Property({ default: false })
+  deleted: boolean = false;
 }

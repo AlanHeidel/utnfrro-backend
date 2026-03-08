@@ -30,9 +30,12 @@ export class Mesa extends BaseEntity {
   @Property({ type: "string", default: MesaEstado.DISPONIBLE })
   estado: MesaEstado = MesaEstado.DISPONIBLE;
 
+  @Property({ default: false })
+  deleted: boolean = false;
+
   @OneToMany(() => Pedido, (pedido: Pedido) => pedido.mesa)
   pedidos = new Collection<Rel<Pedido>>(this);
 
-  @ManyToOne(() => Mozo)
-  mozo!: Mozo;
+  @ManyToOne(() => Mozo, { nullable: true })
+  mozo?: Mozo | null;
 }
