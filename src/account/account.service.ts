@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import { orm } from "../shared/db/orm.js";
 import { Account, AccountRole } from "./account.entity.js";
-import { Cliente } from "../cliente/cliente.entity.js";
 
 const em = orm.em;
 const SALT_ROUNDS = 12;
@@ -10,7 +9,6 @@ export interface RegisterClienteInput {
   email: string;
   password: string;
   nombre?: string;
-  clienteId?: number;
 }
 
 type SanitizedAccount = {
@@ -19,7 +17,6 @@ type SanitizedAccount = {
   nombre: string | null;
   role: AccountRole;
   ultimoLogin: Date | null;
-  cliente: { id: number } | null;
 };
 
 async function hashPassword(plain: string): Promise<string> {
@@ -35,18 +32,12 @@ async function verifyPassword(stored: string | undefined, plain: string) {
 }
 
 function toResponse(account: Account): SanitizedAccount {
-  const cliente =
-    account.cliente && "id" in account.cliente
-      ? { id: account.cliente.id }
-      : null;
-
   return {
     id: account.id,
     identifier: account.identifier,
     nombre: account.nombre ?? null,
     role: account.role,
     ultimoLogin: account.ultimoLogin ?? null,
-    cliente,
   };
 }
 
@@ -71,10 +62,6 @@ export class AccountService {
       passwordHash,
     });
 
-    if (input.clienteId) {
-      account.cliente = await em.getReference(Cliente, input.clienteId);
-    }
-
     await em.persistAndFlush(account);
     return toResponse(account);
   }
@@ -83,8 +70,7 @@ export class AccountService {
     const normalized = identifier.trim().toLowerCase();
     const account = await em.findOne(
       Account,
-      { identifier: normalized },
-      { populate: ["cliente"] }
+      { identifier: normalized }
     );
 
     if (!account) {
@@ -96,12 +82,12 @@ export class AccountService {
   }
 
   async findOne(id: number) {
-    const account = await em.findOneOrFail(Account, { id }, { populate: ["cliente"] });
+    const account = await em.findOneOrFail(Account, { id });
     return toResponse(account);
   }
 
   async list() {
-    const accounts = await em.find(Account, {}, { populate: ["cliente"] });
+    const accounts = await em.find(Account, {});
     return accounts.map(toResponse);
   }
 }

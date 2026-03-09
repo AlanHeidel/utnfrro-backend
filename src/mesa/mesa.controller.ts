@@ -4,12 +4,14 @@ import { Mesa } from "./mesa.entity.js";
 import { tableAccountService } from "../tableAccount/tableAccount.service.js";
 import { NotFoundError } from "@mikro-orm/core";
 import { Mozo } from "../mozo/mozo.entity.js";
+import { reservaService } from "../reserva/reserva.service.js";
 
 const em = orm.em;
 const DEFAULT_TABLE_PASS = process.env.TABLE_DEFAULT_PASS || "mesa-pass";
 
 async function findAll(req: Request, res: Response) {
   try {
+    await reservaService.syncMesaEstadosPorReservas();
     const mesas = await em.find(
       Mesa,
       { deleted: false },
@@ -76,6 +78,7 @@ async function add(req: Request, res: Response) {
 
 async function findOne(req: Request, res: Response) {
   try {
+    await reservaService.syncMesaEstadosPorReservas();
     const id = Number.parseInt(req.params.id);
     const mesa = await em.findOneOrFail(
       Mesa,

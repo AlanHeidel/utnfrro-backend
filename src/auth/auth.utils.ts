@@ -7,7 +7,6 @@ const JWT_SECRET_KEY: Secret = JWT_SECRET || "dev-secret";
 export type AccountTokenPayload = {
     sub: number;
     role: AccountRole;
-    clienteId?: number | null;
     kind: "account";
 };
 

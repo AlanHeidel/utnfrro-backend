@@ -22,7 +22,6 @@ export async function registerCliente(req: Request, res: Response) {
       email: payload.email,
       password: payload.password,
       nombre: payload.nombre,
-      clienteId: payload.clienteId,
     });
 
     res.status(201).json({ message: "account created", data: account });
@@ -51,7 +50,6 @@ export async function login(req: Request, res: Response) {
       const token = signAccountToken({
         sub: account.id,
         role: account.role,
-        clienteId: account.cliente?.id ?? null,
       });
       return res
         .status(200)

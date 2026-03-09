@@ -9,6 +9,7 @@ import { mozoRouter } from "./mozo/mozo.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 import { accountRouter } from "./account/account.routes.js";
+import { reservaRouter } from "./reserva/reserva.routes.js";
 
 import "dotenv/config";
 
@@ -35,13 +36,14 @@ app.use("/api/tipoPlatos", tipoPlatoRouter);
 app.use("/api/mesas", mesaRouter);
 app.use("/api/mozos", mozoRouter);
 app.use("/api/accounts", accountRouter);
-app.use("/api/pedidos", pedidoRouter);
+app.use("/api/reservas", reservaRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
 });
 
 await syncSchema();
+
 app.listen(3000, () => {
   console.log("Server is running on port http://localhost:3000/");
 });
