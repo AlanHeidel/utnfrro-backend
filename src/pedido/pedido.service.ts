@@ -6,6 +6,7 @@ import { Mesa, MesaEstado } from "../mesa/mesa.entity.js";
 import { wrap } from "@mikro-orm/core";
 
 const em = orm.em;
+const PENDING_EXPIRATION_HOURS = 3;
 
 export interface PedidoItemInput {
   platoId: number;
@@ -18,7 +19,24 @@ export interface CreatePedidoInput {
 }
 
 export class PedidoService {
+  private async expireOldPendingPedidos() {
+    const threshold = new Date(
+      Date.now() - PENDING_EXPIRATION_HOURS * 60 * 60 * 1000
+    );
+
+    await em.nativeUpdate(
+      Pedido,
+      {
+        estado: PedidoEstado.PENDING,
+        fechaHora: { $lte: threshold },
+      },
+      { estado: PedidoEstado.CANCELED }
+    );
+  }
+
   async createFromTableDevice(mesaId: number, input: CreatePedidoInput) {
+    await this.expireOldPendingPedidos();
+
     if (!input.items?.length) {
       throw new Error("items is required");
     }
@@ -80,6 +98,7 @@ export class PedidoService {
   }
 
   async list() {
+    await this.expireOldPendingPedidos();
     const pedidos = await em.find(
       Pedido,
       {},
@@ -89,6 +108,7 @@ export class PedidoService {
   }
 
   async findOne(id: number) {
+    await this.expireOldPendingPedidos();
     return em.findOneOrFail(
       Pedido,
       { id },
@@ -97,21 +117,32 @@ export class PedidoService {
   }
 
   async updateEstado(id: number, estado: PedidoEstado) {
+    await this.expireOldPendingPedidos();
     const pedido = await em.findOneOrFail(Pedido, { id });
     pedido.estado = estado;
     await em.flush();
     return pedido;
   }
 
-  async findOneForMesa(id: number, mesaId: number) {
-    const pedido = await em.findOneOrFail(
+  async findCurrentForMesa(mesaId: number) {
+    await this.expireOldPendingPedidos();
+
+    const pedido = await em.findOne(
       Pedido,
-      { id },
-      { populate: ["mesa", "items.plato"] }
+      {
+        mesa: mesaId,
+        estado: { $in: [PedidoEstado.PENDING, PedidoEstado.IN_PROGRESS] },
+      },
+      {
+        populate: ["mesa", "items.plato"],
+        orderBy: { fechaHora: "desc", id: "desc" },
+      }
     );
-    if (pedido.mesa.id !== mesaId) {
-      throw new Error("forbidden");
+
+    if (!pedido) {
+      throw new Error("no active pedido for mesa");
     }
+
     return pedido;
   }
 }

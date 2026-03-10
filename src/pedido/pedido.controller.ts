@@ -58,15 +58,24 @@ async function getPedidoForTableDevice(
   res: Response
 ) {
   try {
-    const mesaId = req.user?.kind === "table-device" ? req.user.mesaId : null;
-    if (!mesaId) return res.status(403).json({ message: "forbidden" });
+    const tokenMesaId =
+      req.user?.kind === "table-device" ? req.user.mesaId : null;
+    if (!tokenMesaId) return res.status(403).json({ message: "forbidden" });
 
-    const id = Number.parseInt(req.params.id);
-    const pedido = await pedidoService.findOneForMesa(id, mesaId);
+    const mesaId = Number.parseInt(req.params.id);
+    if (!Number.isInteger(mesaId)) {
+      return res.status(400).json({ message: "mesa id must be a number" });
+    }
+
+    if (mesaId !== tokenMesaId) {
+      return res.status(403).json({ message: "forbidden" });
+    }
+
+    const pedido = await pedidoService.findCurrentForMesa(mesaId);
     res.status(200).json({ data: pedido });
   } catch (error: any) {
-    if (error.message === "forbidden") {
-      return res.status(403).json({ message: "forbidden" });
+    if (error.message === "no active pedido for mesa") {
+      return res.status(404).json({ message: error.message });
     }
     res.status(404).json({ message: error.message ?? "pedido not found" });
   }

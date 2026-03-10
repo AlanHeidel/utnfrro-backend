@@ -132,6 +132,21 @@ export class ReservaService {
     return new Date(inicio.getTime() + RESERVA_DURATION_HOURS * ONE_HOUR_MS);
   }
 
+  private getNextSlotFrom(date: Date) {
+    const slotMinutes = RESERVA_SLOT_MINUTES;
+    const hasSubMinute = date.getSeconds() !== 0 || date.getMilliseconds() !== 0;
+    const minuteRemainder = date.getMinutes() % slotMinutes;
+    const minutesToAdd =
+      minuteRemainder === 0
+        ? (hasSubMinute ? slotMinutes : 0)
+        : slotMinutes - minuteRemainder;
+
+    const next = new Date(date);
+    next.setSeconds(0, 0);
+    next.setMinutes(next.getMinutes() + minutesToAdd);
+    return next;
+  }
+
   private getWindowForFecha(fecha: { year: number; month: number; day: number }) {
     const rangeStart = new Date(fecha.year, fecha.month, fecha.day, RESERVA_OPEN_HOUR, 0, 0, 0);
     const lastStart =
@@ -179,6 +194,10 @@ export class ReservaService {
 
     const inicio = this.parseInicio(input.inicio);
     const fin = this.calculateFin(inicio);
+    const minAllowedStart = this.getNextSlotFrom(new Date());
+    if (inicio < minAllowedStart) {
+      throw new Error("inicio must be in the future");
+    }
     if (!this.isStartAllowed(inicio)) {
       throw new Error(
         `inicio must be within reservation window (${RESERVA_OPEN_HOUR}:00 to ${
@@ -329,9 +348,26 @@ export class ReservaService {
     }, { populate: ["mesa"] });
 
     const slots: SlotDisponibilidad[] = [];
+    const earliestSlotAllowed = this.getNextSlotFrom(new Date());
+    const firstCursor =
+      rangeStart > earliestSlotAllowed ? rangeStart : earliestSlotAllowed;
+
+    if (firstCursor > lastStart) {
+      return {
+        fecha: query.fecha,
+        personas,
+        window: {
+          from: `${String(RESERVA_OPEN_HOUR).padStart(2, "0")}:00`,
+          to: `${String(RESERVA_CLOSE_HOUR).padStart(2, "0")}:00`,
+        },
+        slotMinutes: RESERVA_SLOT_MINUTES,
+        durationHours: RESERVA_DURATION_HOURS,
+        slots,
+      };
+    }
 
     for (
-      let cursor = new Date(rangeStart);
+      let cursor = new Date(firstCursor);
       cursor <= lastStart;
       cursor = new Date(cursor.getTime() + RESERVA_SLOT_MINUTES * ONE_MINUTE_MS)
     ) {
