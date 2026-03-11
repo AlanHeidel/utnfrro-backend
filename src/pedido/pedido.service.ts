@@ -7,6 +7,7 @@ import { wrap } from "@mikro-orm/core";
 
 const em = orm.em;
 const PENDING_EXPIRATION_HOURS = 3;
+const ACTIVE_PEDIDO_STATES = [PedidoEstado.PENDING, PedidoEstado.IN_PROGRESS];
 
 export interface PedidoItemInput {
   platoId: number;
@@ -19,19 +20,56 @@ export interface CreatePedidoInput {
 }
 
 export class PedidoService {
+  private async syncMesaEstadoByPedidos(mesaId: number) {
+    const mesa = await em.findOne(Mesa, { id: mesaId, deleted: false });
+    if (!mesa) return;
+
+    const activePedidosCount = await em.count(Pedido, {
+      mesa: mesaId,
+      estado: { $in: ACTIVE_PEDIDO_STATES },
+    });
+
+    if (activePedidosCount > 0) {
+      if (mesa.estado !== MesaEstado.OCUPADA) {
+        mesa.estado = MesaEstado.OCUPADA;
+        await em.flush();
+      }
+      return;
+    }
+
+    if (mesa.estado !== MesaEstado.DISPONIBLE) {
+      mesa.estado = MesaEstado.DISPONIBLE;
+      await em.flush();
+    }
+  }
+
   private async expireOldPendingPedidos() {
     const threshold = new Date(
       Date.now() - PENDING_EXPIRATION_HOURS * 60 * 60 * 1000
     );
-
-    await em.nativeUpdate(
+    const expiredPedidos = await em.find(
       Pedido,
       {
         estado: PedidoEstado.PENDING,
         fechaHora: { $lte: threshold },
       },
-      { estado: PedidoEstado.CANCELED }
+      { populate: ["mesa"] }
     );
+
+    if (!expiredPedidos.length) return;
+
+    const affectedMesaIds = new Set<number>();
+
+    for (const pedido of expiredPedidos) {
+      pedido.estado = PedidoEstado.CANCELED;
+      affectedMesaIds.add(pedido.mesa.id);
+    }
+
+    await em.flush();
+
+    for (const mesaId of affectedMesaIds) {
+      await this.syncMesaEstadoByPedidos(mesaId);
+    }
   }
 
   async createFromTableDevice(mesaId: number, input: CreatePedidoInput) {
@@ -118,20 +156,25 @@ export class PedidoService {
 
   async updateEstado(id: number, estado: PedidoEstado) {
     await this.expireOldPendingPedidos();
-    const pedido = await em.findOneOrFail(Pedido, { id });
+    const pedido = await em.findOneOrFail(Pedido, { id }, { populate: ["mesa"] });
     pedido.estado = estado;
     await em.flush();
+    await this.syncMesaEstadoByPedidos(pedido.mesa.id);
     return pedido;
   }
 
-  async findCurrentForMesa(mesaId: number) {
+  private async findForMesaByEstados(
+    mesaId: number,
+    estados: PedidoEstado[],
+    notFoundMessage: string
+  ) {
     await this.expireOldPendingPedidos();
 
-    const pedido = await em.findOne(
+    const pedidos = await em.find(
       Pedido,
       {
-        mesa: mesaId,
-        estado: { $in: [PedidoEstado.PENDING, PedidoEstado.IN_PROGRESS] },
+        mesa: { id: mesaId },
+        estado: { $in: estados },
       },
       {
         populate: ["mesa", "items.plato"],
@@ -139,11 +182,27 @@ export class PedidoService {
       }
     );
 
-    if (!pedido) {
-      throw new Error("no active pedido for mesa");
+    if (!pedidos.length) {
+      throw new Error(notFoundMessage);
     }
 
-    return pedido;
+    return pedidos;
+  }
+
+  async findPendingForMesa(mesaId: number) {
+    return this.findForMesaByEstados(
+      mesaId,
+      [PedidoEstado.PENDING],
+      "no pending pedido for mesa"
+    );
+  }
+
+  async findInProgressForMesa(mesaId: number) {
+    return this.findForMesaByEstados(
+      mesaId,
+      [PedidoEstado.IN_PROGRESS],
+      "no in-progress pedido for mesa"
+    );
   }
 }
 

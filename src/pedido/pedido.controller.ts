@@ -53,7 +53,7 @@ async function updateEstado(req: Request, res: Response) {
   }
 }
 
-async function getPedidoForTableDevice(
+async function getPendingPedidosForTableDevice(
   req: Request & { user?: AnyTokenPayload },
   res: Response
 ) {
@@ -71,14 +71,49 @@ async function getPedidoForTableDevice(
       return res.status(403).json({ message: "forbidden" });
     }
 
-    const pedido = await pedidoService.findCurrentForMesa(mesaId);
-    res.status(200).json({ data: pedido });
+    const pedidos = await pedidoService.findPendingForMesa(mesaId);
+    res.status(200).json({ data: pedidos });
   } catch (error: any) {
-    if (error.message === "no active pedido for mesa") {
+    if (error.message === "no pending pedido for mesa") {
       return res.status(404).json({ message: error.message });
     }
     res.status(404).json({ message: error.message ?? "pedido not found" });
   }
 }
 
-export { findAll, findOne, createFromTableDevice, updateEstado, getPedidoForTableDevice };
+async function getInProgressPedidosForTableDevice(
+  req: Request & { user?: AnyTokenPayload },
+  res: Response
+) {
+  try {
+    const tokenMesaId =
+      req.user?.kind === "table-device" ? req.user.mesaId : null;
+    if (!tokenMesaId) return res.status(403).json({ message: "forbidden" });
+
+    const mesaId = Number.parseInt(req.params.id);
+    if (!Number.isInteger(mesaId)) {
+      return res.status(400).json({ message: "mesa id must be a number" });
+    }
+
+    if (mesaId !== tokenMesaId) {
+      return res.status(403).json({ message: "forbidden" });
+    }
+
+    const pedidos = await pedidoService.findInProgressForMesa(mesaId);
+    res.status(200).json({ data: pedidos });
+  } catch (error: any) {
+    if (error.message === "no in-progress pedido for mesa") {
+      return res.status(404).json({ message: error.message });
+    }
+    res.status(404).json({ message: error.message ?? "pedido not found" });
+  }
+}
+
+export {
+  findAll,
+  findOne,
+  createFromTableDevice,
+  updateEstado,
+  getPendingPedidosForTableDevice,
+  getInProgressPedidosForTableDevice,
+};

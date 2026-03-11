@@ -3,8 +3,9 @@ import {
   createFromTableDevice,
   findAll,
   findOne,
+  getInProgressPedidosForTableDevice,
+  getPendingPedidosForTableDevice,
   updateEstado,
-  getPedidoForTableDevice,
 } from "./pedido.controller.js";
 import {
   requireAuth,
@@ -17,7 +18,16 @@ export const pedidoRouter = Router();
 
 pedidoRouter.get("/", requireAuth, requireRole(AccountRole.ADMIN), findAll);
 pedidoRouter.get("/:id", requireAuth, requireRole(AccountRole.ADMIN), findOne);
-pedidoRouter.get("/table/:id", requireTableDevice, getPedidoForTableDevice);
+pedidoRouter.get(
+  "/table/:id/recibidos",
+  requireTableDevice,
+  getPendingPedidosForTableDevice
+);
+pedidoRouter.get(
+  "/table/:id/en-cocina",
+  requireTableDevice,
+  getInProgressPedidosForTableDevice
+);
 pedidoRouter.post("/table", requireTableDevice, createFromTableDevice);
 pedidoRouter.patch(
   "/:id/estado",
