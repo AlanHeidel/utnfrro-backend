@@ -1,6 +1,7 @@
 import {
   Cascade,
   Collection,
+  DateTimeType,
   Entity,
   Enum,
   OneToMany,
@@ -13,6 +14,7 @@ import { Mesa, MesaEstado } from "../mesa/mesa.entity.js";
 import { PedidoItem } from "./pedidoItem.entity.js";
 
 export enum PedidoEstado {
+  PENDING_PAYMENT = "pending_payment",
   PENDING = "pending",
   IN_PROGRESS = "in_progress",
   DELIVERED = "delivered",
@@ -32,6 +34,21 @@ export class Pedido extends BaseEntity {
 
   @Property()
   total!: number;
+
+  @Property({ nullable: true, unique: true })
+  paymentExternalReference?: string;
+
+  @Property({ nullable: true })
+  mpPreferenceId?: string;
+
+  @Property({ nullable: true })
+  mpPaymentId?: string;
+
+  @Property({ nullable: true })
+  mpPaymentStatus?: string;
+
+  @Property({ type: DateTimeType, nullable: true })
+  paidAt?: Date;
 
   @OneToMany(() => PedidoItem, (item: PedidoItem) => item.pedido, {
     cascade: [Cascade.ALL],

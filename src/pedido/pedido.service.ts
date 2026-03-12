@@ -7,6 +7,10 @@ import { wrap } from "@mikro-orm/core";
 
 const em = orm.em;
 const PENDING_EXPIRATION_HOURS = 3;
+const EXPIRES_TO_CANCELED_STATES = [
+  PedidoEstado.PENDING,
+  PedidoEstado.PENDING_PAYMENT,
+];
 const ACTIVE_PEDIDO_STATES = [PedidoEstado.PENDING, PedidoEstado.IN_PROGRESS];
 
 export interface PedidoItemInput {
@@ -50,7 +54,7 @@ export class PedidoService {
     const expiredPedidos = await em.find(
       Pedido,
       {
-        estado: PedidoEstado.PENDING,
+        estado: { $in: EXPIRES_TO_CANCELED_STATES },
         fechaHora: { $lte: threshold },
       },
       { populate: ["mesa"] }
@@ -202,6 +206,14 @@ export class PedidoService {
       mesaId,
       [PedidoEstado.IN_PROGRESS],
       "no in-progress pedido for mesa"
+    );
+  }
+
+  async findPendingPaymentForMesa(mesaId: number) {
+    return this.findForMesaByEstados(
+      mesaId,
+      [PedidoEstado.PENDING_PAYMENT],
+      "no pending-payment pedido for mesa"
     );
   }
 }

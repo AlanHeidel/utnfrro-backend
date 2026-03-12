@@ -4,6 +4,7 @@ import {
   findAll,
   findOne,
   getInProgressPedidosForTableDevice,
+  getPendingPaymentPedidosForTableDevice,
   getPendingPedidosForTableDevice,
   updateEstado,
 } from "./pedido.controller.js";
@@ -27,6 +28,11 @@ pedidoRouter.get(
   "/table/:id/en-cocina",
   requireTableDevice,
   getInProgressPedidosForTableDevice
+);
+pedidoRouter.get(
+  "/table/:id/pendientes-pago",
+  requireTableDevice,
+  getPendingPaymentPedidosForTableDevice
 );
 pedidoRouter.post("/table", requireTableDevice, createFromTableDevice);
 pedidoRouter.patch(

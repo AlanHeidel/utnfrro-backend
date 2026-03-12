@@ -75,9 +75,9 @@ async function getPendingPedidosForTableDevice(
     res.status(200).json({ data: pedidos });
   } catch (error: any) {
     if (error.message === "no pending pedido for mesa") {
-      return res.status(404).json({ message: error.message });
+      return res.status(200).json({ data: [] });
     }
-    res.status(404).json({ message: error.message ?? "pedido not found" });
+    res.status(500).json({ message: error.message ?? "unable to list pedidos" });
   }
 }
 
@@ -103,9 +103,37 @@ async function getInProgressPedidosForTableDevice(
     res.status(200).json({ data: pedidos });
   } catch (error: any) {
     if (error.message === "no in-progress pedido for mesa") {
-      return res.status(404).json({ message: error.message });
+      return res.status(200).json({ data: [] });
     }
-    res.status(404).json({ message: error.message ?? "pedido not found" });
+    res.status(500).json({ message: error.message ?? "unable to list pedidos" });
+  }
+}
+
+async function getPendingPaymentPedidosForTableDevice(
+  req: Request & { user?: AnyTokenPayload },
+  res: Response
+) {
+  try {
+    const tokenMesaId =
+      req.user?.kind === "table-device" ? req.user.mesaId : null;
+    if (!tokenMesaId) return res.status(403).json({ message: "forbidden" });
+
+    const mesaId = Number.parseInt(req.params.id);
+    if (!Number.isInteger(mesaId)) {
+      return res.status(400).json({ message: "mesa id must be a number" });
+    }
+
+    if (mesaId !== tokenMesaId) {
+      return res.status(403).json({ message: "forbidden" });
+    }
+
+    const pedidos = await pedidoService.findPendingPaymentForMesa(mesaId);
+    res.status(200).json({ data: pedidos });
+  } catch (error: any) {
+    if (error.message === "no pending-payment pedido for mesa") {
+      return res.status(200).json({ data: [] });
+    }
+    res.status(500).json({ message: error.message ?? "unable to list pedidos" });
   }
 }
 
@@ -116,4 +144,5 @@ export {
   updateEstado,
   getPendingPedidosForTableDevice,
   getInProgressPedidosForTableDevice,
+  getPendingPaymentPedidosForTableDevice,
 };

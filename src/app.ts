@@ -10,14 +10,33 @@ import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 import { accountRouter } from "./account/account.routes.js";
 import { reservaRouter } from "./reserva/reserva.routes.js";
+import { paymentRouter } from "./payment/payment.routes.js";
 
 import "dotenv/config";
 
 const app = express();
 
+const defaultAllowedOrigins = ["http://localhost:5173"];
+const envAllowedOrigins = (process.env.CORS_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const allowedOrigins = new Set([...defaultAllowedOrigins, ...envAllowedOrigins]);
+
+const isAllowedOrigin = (origin?: string) => {
+  if (!origin) return true;
+  if (allowedOrigins.has(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+\.ngrok-free\.dev$/i.test(origin);
+};
+
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked origin: ${origin ?? "unknown"}`));
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -37,6 +56,7 @@ app.use("/api/mesas", mesaRouter);
 app.use("/api/mozos", mozoRouter);
 app.use("/api/accounts", accountRouter);
 app.use("/api/reservas", reservaRouter);
+app.use("/api/payments", paymentRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
