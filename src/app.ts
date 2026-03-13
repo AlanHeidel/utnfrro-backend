@@ -16,23 +16,33 @@ import "dotenv/config";
 
 const app = express();
 
-const defaultAllowedOrigins = ["http://localhost:5173"];
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
+
 const envAllowedOrigins = (process.env.CORS_ORIGINS ?? "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
-const allowedOrigins = new Set([...defaultAllowedOrigins, ...envAllowedOrigins]);
+
+const allowedOrigins = new Set([
+  ...defaultAllowedOrigins,
+  ...envAllowedOrigins,
+]);
 
 const isAllowedOrigin = (origin?: string) => {
   if (!origin) return true;
   if (allowedOrigins.has(origin)) return true;
-  return /^https:\/\/[a-z0-9-]+\.ngrok-free\.dev$/i.test(origin);
+  // Quick Tunnel de Cloudflare
+  if (/^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/i.test(origin)) return true;
+  return false;
 };
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) {
+      if (isAllowedOrigin(origin ?? undefined)) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked origin: ${origin ?? "unknown"}`));
@@ -40,7 +50,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());

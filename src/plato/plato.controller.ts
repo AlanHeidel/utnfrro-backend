@@ -31,6 +31,39 @@ async function findAll(req: Request, res: Response) {
   }
 }
 
+async function findDestacados(req: Request, res: Response) {
+  try {
+    const platos = await em.find(
+      Plato,
+      { estado: PlatoEstado.DESTACADO },
+      {
+        populate: ["tipoPlato"],
+        orderBy: { id: "asc" },
+        limit: 6,
+      }
+    );
+    res.status(200).json({ message: "finded destacados", data: platos });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function findMenu(req: Request, res: Response) {
+  try {
+    const platos = await em.find(
+      Plato,
+      { estado: { $ne: PlatoEstado.AGOTADO } },
+      {
+        populate: ["tipoPlato"],
+        orderBy: { id: "asc" },
+      }
+    );
+    res.status(200).json({ message: "finded menu platos", data: platos });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function add(req: Request, res: Response) {
   try {
     const plato = em.create(Plato, req.body);
@@ -79,4 +112,4 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { findAll, findOne, add, update, remove };
+export { findAll, findDestacados, findMenu, findOne, add, update, remove };
