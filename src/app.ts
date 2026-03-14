@@ -1,16 +1,16 @@
 import "reflect-metadata";
 import express from "express";
 import cors from "cors";
-import { platoRouter } from "./plato/plato.routes.js";
-import { pedidoRouter } from "./pedido/pedido.routes.js";
-import { tipoPlatoRouter } from "./tipoPlato/tipoPlato.routes.js";
-import { mesaRouter } from "./mesa/mesa.routes.js";
-import { mozoRouter } from "./mozo/mozo.routes.js";
+import { platoRouter } from "./modules/plato/plato.routes.js";
+import { pedidoRouter } from "./modules/pedido/pedido.routes.js";
+import { tipoPlatoRouter } from "./modules/tipoPlato/tipoPlato.routes.js";
+import { mesaRouter } from "./modules/mesa/mesa.routes.js";
+import { mozoRouter } from "./modules/mozo/mozo.routes.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
-import { accountRouter } from "./account/account.routes.js";
-import { reservaRouter } from "./reserva/reserva.routes.js";
-import { paymentRouter } from "./payment/payment.routes.js";
+import { accountRouter } from "./modules/account/account.routes.js";
+import { reservaRouter } from "./modules/reserva/reserva.routes.js";
+import { paymentRouter } from "./modules/payment/payment.routes.js";
 
 import "dotenv/config";
 
