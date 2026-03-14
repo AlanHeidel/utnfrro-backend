@@ -1,13 +1,30 @@
 import dotenv from "dotenv";
 
-dotenv.config({ override: true });
+const isTestEnv =
+  process.env.NODE_ENV === "test" || process.env.VITEST === "true";
+
+dotenv.config({
+  path: isTestEnv ? ".env.test" : ".env",
+  override: true,
+});
 
 const envOrDefault = (value: string | undefined, fallback: string) => {
   const trimmed = value?.trim();
   return trimmed ? trimmed : fallback;
 };
 
-export const JWT_SECRET: string = process.env.JWT_SECRET ?? "dev-secret";
+const requiredEnv = (value: string | undefined, name: string) => {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    throw new Error(`${name} is required`);
+  }
+  return trimmed;
+};
+
+export const JWT_SECRET: string = requiredEnv(
+  process.env.JWT_SECRET,
+  "JWT_SECRET",
+);
 
 export const JWT_EXP_CLIENT: string = process.env.JWT_EXP_CLIENT ?? "1h";
 export const JWT_EXP_ADMIN: string = process.env.JWT_EXP_ADMIN ?? "1h";
@@ -57,7 +74,7 @@ export const MP_CURRENCY_ID: string = envOrDefault(
   "ARS"
 );
 
-// Database configuration - dont use env vars for this, just hardcode them for simplicity
+// Database configuration
 export const DB_HOST: string = process.env.DB_HOST ?? "127.0.0.1";
 export const DB_PORT: number = Number(process.env.DB_PORT ?? "3306");
 export const DB_USER: string = process.env.DB_USER ?? "root";

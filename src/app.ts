@@ -6,7 +6,7 @@ import { pedidoRouter } from "./modules/pedido/pedido.routes.js";
 import { tipoPlatoRouter } from "./modules/tipoPlato/tipoPlato.routes.js";
 import { mesaRouter } from "./modules/mesa/mesa.routes.js";
 import { mozoRouter } from "./modules/mozo/mozo.routes.js";
-import { orm, syncSchema } from "./shared/db/orm.js";
+import { orm } from "./shared/db/orm.js";
 import { RequestContext } from "@mikro-orm/mysql";
 import { accountRouter } from "./modules/account/account.routes.js";
 import { reservaRouter } from "./modules/reserva/reserva.routes.js";
@@ -72,8 +72,4 @@ app.use((_, res) => {
   res.status(404).send("Endpoint not found");
 });
 
-await syncSchema();
-
-app.listen(3000, () => {
-  console.log("Server is running on port http://localhost:3000/");
-});
+export { app };
