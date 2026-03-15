@@ -11,7 +11,7 @@ import { RequestContext } from "@mikro-orm/mysql";
 import { accountRouter } from "./modules/account/account.routes.js";
 import { reservaRouter } from "./modules/reserva/reserva.routes.js";
 import { paymentRouter } from "./modules/payment/payment.routes.js";
-
+import { adminRouter } from "./modules/admin/admin.routes.js";
 import "dotenv/config";
 
 const app = express();
@@ -67,6 +67,7 @@ app.use("/api/mozos", mozoRouter);
 app.use("/api/accounts", accountRouter);
 app.use("/api/reservas", reservaRouter);
 app.use("/api/payments", paymentRouter);
+app.use("/api/admin", adminRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
