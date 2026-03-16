@@ -16,6 +16,7 @@ import {
   DB_PASSWORD,
   DB_PORT,
   DB_USER,
+  ORM_DEBUG,
 } from "../../config/config.js";
 
 export const orm = await MikroORM.init({
@@ -37,7 +38,7 @@ export const orm = await MikroORM.init({
   password: DB_PASSWORD,
   dbName: DB_NAME,
   highlighter: new SqlHighlighter(),
-  debug: true,
+  debug: ORM_DEBUG,
   schemaGenerator: {
     //never in production
     disableForeignKeys: true,

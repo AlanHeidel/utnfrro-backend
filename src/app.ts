@@ -12,14 +12,14 @@ import { accountRouter } from "./modules/account/account.routes.js";
 import { reservaRouter } from "./modules/reserva/reserva.routes.js";
 import { paymentRouter } from "./modules/payment/payment.routes.js";
 import { adminRouter } from "./modules/admin/admin.routes.js";
+import { FRONTEND_BASE_URL, IS_PROD } from "./config/config.js";
 import "dotenv/config";
 
 const app = express();
 
-const defaultAllowedOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-];
+const defaultAllowedOrigins = IS_PROD
+  ? [FRONTEND_BASE_URL]
+  : [FRONTEND_BASE_URL, "http://localhost:5173", "http://127.0.0.1:5173"];
 
 const envAllowedOrigins = (process.env.CORS_ORIGINS ?? "")
   .split(",")
