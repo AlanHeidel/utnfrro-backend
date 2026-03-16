@@ -2,10 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/src/server.js",
   "type": "module",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
+    "start": "node ./dist/src/server.js",
     "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/src/server.js\"",
     "test": "vitest",
     "test:run": "vitest run",
