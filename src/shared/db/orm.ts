@@ -10,6 +10,7 @@ import { Reserva } from "../../modules/reserva/reserva.entity.js";
 import { TableAccount } from "../../modules/tableAccount/tableAccount.entity.js";
 import { TipoPlato } from "../../modules/tipoPlato/tipoPlato.entity.js";
 import { AdminMonthlyObjective } from "../../modules/admin/adminMonthlyObjective.entity.js";
+import { Notification } from "../../modules/notification/notification.entity.js";
 import {
   DB_HOST,
   DB_NAME,
@@ -28,6 +29,7 @@ export const orm = await MikroORM.init({
     PedidoItem,
     Plato,
     Reserva,
+    Notification,
     TableAccount,
     TipoPlato,
     AdminMonthlyObjective,

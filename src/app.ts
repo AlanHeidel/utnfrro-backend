@@ -12,6 +12,7 @@ import { accountRouter } from "./modules/account/account.routes.js";
 import { reservaRouter } from "./modules/reserva/reserva.routes.js";
 import { paymentRouter } from "./modules/payment/payment.routes.js";
 import { adminRouter } from "./modules/admin/admin.routes.js";
+import { notificationRouter } from "./modules/notification/notification.routes.js";
 import { FRONTEND_BASE_URL, IS_PROD } from "./config/config.js";
 import "dotenv/config";
 
@@ -34,8 +35,6 @@ const allowedOrigins = new Set([
 const isAllowedOrigin = (origin?: string) => {
   if (!origin) return true;
   if (allowedOrigins.has(origin)) return true;
-  // Quick Tunnel de Cloudflare
-  if (/^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/i.test(origin)) return true;
   return false;
 };
 
@@ -68,6 +67,7 @@ app.use("/api/accounts", accountRouter);
 app.use("/api/reservas", reservaRouter);
 app.use("/api/payments", paymentRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/notifications", notificationRouter);
 
 app.use((_, res) => {
   res.status(404).send("Endpoint not found");
